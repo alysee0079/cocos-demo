@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "aaa": "./assets/src/Consts.ts"
+  }
+}

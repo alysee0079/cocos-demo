@@ -2,13 +2,17 @@ import {
   _decorator,
   Component,
   Node,
-  input,
-  Input,
   EventMouse,
   Vec3,
+  log,
+  Animation,
 } from "cc";
+// import cloneDeep from "lodash.clonedeep";
+import aaa from "aaa";
 const { ccclass, property } = _decorator;
 export const BLOCK_SIZE = 40; // 添加一个放大比
+const oneStep = "oneStep";
+const twoStep = "twoStep";
 
 @ccclass("PlayerController")
 export class PlayerController extends Component {
@@ -21,9 +25,14 @@ export class PlayerController extends Component {
   private _deltaPos: Vec3 = new Vec3(0, 0, 0);
   private _targetPos: Vec3 = new Vec3();
 
+  @property(Animation)
+  BodyAnim: Animation = null;
+
   start() {
-    console.log(17);
-    input.on(Input.EventType.MOUSE_UP, this.onMouseUp, this);
+    // log(this.node);
+    // log(cloneDeep({ a: 1 }));
+    log(aaa);
+    this.node.on(Node.EventType.MOUSE_UP, this.onMouseUp, this);
   }
   update(deltaTime: number) {
     if (this._startJump) {
@@ -43,7 +52,13 @@ export class PlayerController extends Component {
     }
   }
   onMouseUp(event: EventMouse) {
-    this.jumpByStep(1);
+    if (event.getButton() === 0) {
+      this._jumpTime = this.BodyAnim.getState(oneStep).duration;
+      this.jumpByStep(1);
+    } else if (event.getButton() === 2) {
+      this._jumpTime = this.BodyAnim.getState(twoStep).duration;
+      this.jumpByStep(2);
+    }
   }
   jumpByStep(step) {
     if (this._startJump) return;
@@ -57,5 +72,12 @@ export class PlayerController extends Component {
       this._curPos,
       new Vec3(this._jumpStep * BLOCK_SIZE, 0, 0)
     );
+    if (this.BodyAnim) {
+      if (step === 1) {
+        this.BodyAnim.play(oneStep);
+      } else {
+        this.BodyAnim.play(twoStep);
+      }
+    }
   }
 }
